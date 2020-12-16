@@ -1,0 +1,141 @@
+int Pins[] = {3,4,5,7,8,9};		//initalize pins 
+String ans = "", turn = "";
+int cspeed = 0, a1 = 0, b1 = 0, a2 = 0, b2 = 0, ans2 = 0;
+
+void setup()
+{
+  Init();	//function to set pins
+}
+
+void Init(){
+  for(int i = 0; i > 6; i++){
+    pinMode(Pins[i], OUTPUT);	//for loop to set motor pins to OUTPUT
+  }
+  Serial.begin(9600);	//starts serial monitor
+}
+
+void loop()
+{
+  Menu();	//function for the interface
+  Detect();	//detects the user's choice
+}
+
+void Menu(){
+  Serial.println("Driving Options: ");	//prints options
+  Serial.println("Brake or Coast");
+  while (Serial.available() == 0){	//waits for user input
+  }
+  ans = Serial.readString();		//sets variable to user's choice
+  Serial.println("Your choice: ");
+  Serial.println(ans);				//prints choice
+}
+
+void Detect(){
+  if (ans == "Brake")	//detects if the user selected Brake
+  {
+    Brake();
+  }
+  if(ans == "Coast"){	//detects if the user selected Coast
+    Coast();
+    
+  }
+  if((ans != "Brake" )&& (ans != "Coast")){	//detects if the user selected neither
+    Serial.println("Input Speed: ");		//asks the user for the speed
+    while (Serial.available() == 0){		//waits for response
+    }
+    cspeed = Serial.parseInt();
+    Serial.println(cspeed);
+    Serial.println("Options: ");			//displays turning options
+    Serial.println("1.Point Left");
+    Serial.println("2.Point Right");
+    Serial.println("3.Swing Left");
+    Serial.println("4.Swing Right");
+    Serial.println("5.Niether");
+    while (Serial.available() == 0){		//waits for response
+    }
+    ans2 = Serial.parseInt();
+    if (ans2 == 1){				//detects point left
+      pointL();
+    }
+    if (ans2 == 2){				//detects point right
+      pointR();
+    }
+    if (ans2 == 3){				//detects swing left
+      swingL();
+    }
+    if (ans2 == 4){				//detects swing right
+      swingR();
+    }
+    if (ans2 == 5){				//detects neither
+      Niether();
+    }
+  }
+}
+  
+void Brake(){	//function for brake
+  a1 = 0;		//sets variables to zero for motor control function
+  b1 = 0;
+  a2 = 0;
+  b2 = 0;
+  cspeed = 0;
+  motorctrl();	
+}
+
+void Coast(){	//function for coast
+  a1 = 1;		//sets variables  to one for coast mode
+  b1 = 1;
+  a2 = 1;
+  b2 = 1;
+  cspeed = 256;
+  motorctrl();
+}
+
+void motorctrl(){	//function to control the motors
+  digitalWrite(3, a1); 		//sets left motor to either CW or CCW
+  digitalWrite(4, b1);
+  analogWrite(5,cspeed);    //set left motor rpm to the variable
+  digitalWrite(7, a2);		//sets right motor to either CW or CCW
+  digitalWrite(8, b2);
+  analogWrite(9,cspeed); 	//set right motor rpm to the variable
+}
+
+  
+void pointL(){	//function for point left
+  a1 = 0;		//sets left motor to CCW
+  b1 = 1;
+  a2 = 1;		//sets right motor to CW
+  b2 = 0;
+  motorctrl();
+}
+
+void pointR(){	//function for point right
+  a1 = 1;		//sets left motor to CW
+  b1 = 0;
+  a2 = 0;		//sets right motor to CCW
+  b2 = 1;
+  motorctrl();
+}
+
+void swingL(){	//function for swing left 
+  a1 = 0;		//turns of left motor
+  b1 = 0;
+  a2 = 1;		//sets right motor to CW
+  b2 = 0;
+  motorctrl();
+}
+
+void swingR(){	//function for swing right
+  a1 = 1;		//sets left motor to CW
+  b1 = 0;
+  a2 = 0;		//turns off right motor
+  b2 = 0;
+  motorctrl();
+}
+
+void Niether(){//function for neither
+  a1= 1;       //both motor CW
+  b1 =0;
+  a2 = 1;
+  b2 =0;
+  motorctrl();
+}
